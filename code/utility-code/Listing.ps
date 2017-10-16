@@ -1,0 +1,2770 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 38 24 574 768
+%%Title: Listing.ps
+%%For: Wesley Mackey
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Tue Oct 18 13:31:20 2016
+%%Orientation: Portrait
+%%Pages: (atend)
+%%DocumentMedia: Letter 612 792 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier-Bold /F-gs-font MF
+/F-gs-font 11 11 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [612 792] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript-mycolor 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+/HeaderPageCountF /Helvetica-Bold findfont 18 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    /dhw d_header_w 4 sub def
+
+    /linecolor {0 0 0 setrgbcolor} bind def  % line color
+    /txcolor   {0 0 0 setrgbcolor} bind def  % text color
+    /fncolor   {0 0 0 setrgbcolor} bind def  % filename line color
+
+    .5 setlinewidth
+
+    % line across bottom of the header area
+    linecolor
+    0 0 moveto dhw 0 lineto
+
+    % side boxes
+    /sbw d_header_h 2 mul def	% side box width
+
+    % left side box
+    0 0 sbw d_header_h Box
+    linecolor
+    stroke
+
+    % date/time in left box
+    txcolor
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop sbw exch sub 2 div
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop sbw exch sub 2 div
+    d_header_h 5 div moveto show
+
+    % right side box
+    dhw sbw sub 0 sbw d_header_h Box
+    linecolor
+    stroke
+
+    % get width of pagecount
+    HeaderPageCountF setfont
+    pagecountstr stringwidth pop
+
+    txcolor
+    HeaderPageNumF setfont
+    pagenumstr stringwidth pop add  % add to width of pagecount
+    sbw exch sub 2 div dhw sbw sub add
+    d_header_h .2 mul moveto
+
+    pagenumstr show
+
+    HeaderPageCountF setfont
+    pagecountstr show
+
+    % filename
+    fncolor
+    HeaderHDRF setfont
+    dhw fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % HACK around a bug in enscript 1.6.0:
+      % for some reason this is getting set to "(null)" and
+      %
+      user_header_center_str (\(null\)) eq {
+        /user_header_center_str () def
+      } if
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        dhw user_header_left_str stringwidth pop sub 2 div
+        h moveto user_header_left_str show
+      } {
+        sbw 5 add h moveto user_header_left_str show
+
+        dhw user_header_center_str stringwidth pop sub 2 div
+        h moveto user_header_center_str show
+
+	dhw sbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} bind def
+%%EndResource
+/d_page_w 536 def
+/d_page_h 744 def
+/d_header_x 0 def
+/d_header_y 708 def
+/d_header_w 536 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 536 def
+/d_footer_h 0 def
+/d_output_w 536 def
+/d_output_h 708 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (astree.h) def
+/fdir (.) def
+/ftail (astree.h) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/1) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: astree.h,v 1.7 2016-10-06 16:13:39-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#ifndef __ASTREE_H__) s
+32.4 658 M (4:) s
+52.2 658 M
+(#define __ASTREE_H__) s
+32.4 646 M (5:) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include <string>) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <vector>) s
+32.4 610 M (8:) s
+52.2 610 M
+(using namespace std;) s
+32.4 598 M (9:) s
+25.8 586 M (10:) s
+52.2 586 M
+(#include "auxlib.h") s
+25.8 574 M (11:) s
+25.8 562 M (12:) s
+52.2 562 M
+(struct location {) s
+25.8 550 M (13:) s
+52.2 550 M
+(   size_t filenr;) s
+25.8 538 M (14:) s
+52.2 538 M
+(   size_t linenr;) s
+25.8 526 M (15:) s
+52.2 526 M
+(   size_t offset;) s
+25.8 514 M (16:) s
+52.2 514 M
+(};) s
+25.8 502 M (17:) s
+25.8 490 M (18:) s
+52.2 490 M
+(struct astree {) s
+25.8 478 M (19:) s
+25.8 466 M (20:) s
+52.2 466 M
+(   // Fields.) s
+25.8 454 M (21:) s
+52.2 454 M
+(   int symbol;               // token code) s
+25.8 442 M (22:) s
+52.2 442 M
+(   location lloc;            // source location) s
+25.8 430 M (23:) s
+52.2 430 M
+(   const string* lexinfo;    // pointer to lexical information) s
+25.8 418 M (24:) s
+52.2 418 M
+(   vector<astree*> children; // children of this n-way node) s
+25.8 406 M (25:) s
+25.8 394 M (26:) s
+52.2 394 M
+(   // Functions.) s
+25.8 382 M (27:) s
+52.2 382 M
+(   astree \(int symbol, const location&, const char* lexinfo\);) s
+25.8 370 M (28:) s
+52.2 370 M
+(   ~astree\(\);) s
+25.8 358 M (29:) s
+52.2 358 M
+(   astree* adopt \(astree* child1, astree* child2 = nullptr\);) s
+25.8 346 M (30:) s
+52.2 346 M
+(   astree* adopt_sym \(astree* child, int symbol\);) s
+25.8 334 M (31:) s
+52.2 334 M
+(   void dump_node \(FILE*\);) s
+25.8 322 M (32:) s
+52.2 322 M
+(   void dump_tree \(FILE*, int depth = 0\);) s
+25.8 310 M (33:) s
+52.2 310 M
+(   static void dump \(FILE* outfile, astree* tree\);) s
+25.8 298 M (34:) s
+52.2 298 M
+(   static void print \(FILE* outfile, astree* tree, int depth = 0\);) s
+25.8 286 M (35:) s
+52.2 286 M
+(};) s
+25.8 274 M (36:) s
+25.8 262 M (37:) s
+52.2 262 M
+(void destroy \(astree* tree1, astree* tree2 = nullptr\);) s
+25.8 250 M (38:) s
+25.8 238 M (39:) s
+52.2 238 M
+(void errllocprintf \(const location&, const char* format, const char*\);) s
+25.8 226 M (40:) s
+25.8 214 M (41:) s
+52.2 214 M
+(#endif) s
+25.8 202 M (42:) s
+_R
+S
+%%Page: (1) 2
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (astree.cpp) def
+/fdir (.) def
+/ftail (astree.cpp) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: astree.cpp,v 1.8 2016-09-21 17:13:03-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#include <assert.h>) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <inttypes.h>) s
+32.4 646 M (5:) s
+52.2 646 M
+(#include <stdarg.h>) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include <stdio.h>) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <stdlib.h>) s
+32.4 610 M (8:) s
+52.2 610 M
+(#include <string.h>) s
+32.4 598 M (9:) s
+25.8 586 M (10:) s
+52.2 586 M
+(#include "astree.h") s
+25.8 574 M (11:) s
+52.2 574 M
+(#include "string_set.h") s
+25.8 562 M (12:) s
+52.2 562 M
+(#include "lyutils.h") s
+25.8 550 M (13:) s
+25.8 538 M (14:) s
+52.2 538 M
+(astree::astree \(int symbol_, const location& lloc_, const char* info\) {) s
+25.8 526 M (15:) s
+52.2 526 M
+(   symbol = symbol_;) s
+25.8 514 M (16:) s
+52.2 514 M
+(   lloc = lloc_;) s
+25.8 502 M (17:) s
+52.2 502 M
+(   lexinfo = string_set::intern \(info\);) s
+25.8 490 M (18:) s
+52.2 490 M
+(   // vector defaults to empty -- no children) s
+25.8 478 M (19:) s
+52.2 478 M
+(}) s
+25.8 466 M (20:) s
+25.8 454 M (21:) s
+52.2 454 M
+(astree::~astree\(\) {) s
+25.8 442 M (22:) s
+52.2 442 M
+(   while \(not children.empty\(\)\) {) s
+25.8 430 M (23:) s
+52.2 430 M
+(      astree* child = children.back\(\);) s
+25.8 418 M (24:) s
+52.2 418 M
+(      children.pop_back\(\);) s
+25.8 406 M (25:) s
+52.2 406 M
+(      delete child;) s
+25.8 394 M (26:) s
+52.2 394 M
+(   }) s
+25.8 382 M (27:) s
+52.2 382 M
+(   if \(yydebug\) {) s
+25.8 370 M (28:) s
+52.2 370 M
+(      fprintf \(stderr, "Deleting astree \("\);) s
+25.8 358 M (29:) s
+52.2 358 M
+(      astree::dump \(stderr, this\);) s
+25.8 346 M (30:) s
+52.2 346 M
+(      fprintf \(stderr, "\)\\n"\);) s
+25.8 334 M (31:) s
+52.2 334 M
+(   }) s
+25.8 322 M (32:) s
+52.2 322 M
+(}) s
+25.8 310 M (33:) s
+25.8 298 M (34:) s
+52.2 298 M
+(astree* astree::adopt \(astree* child1, astree* child2\) {) s
+25.8 286 M (35:) s
+52.2 286 M
+(   if \(child1 != nullptr\) children.push_back \(child1\);) s
+25.8 274 M (36:) s
+52.2 274 M
+(   if \(child2 != nullptr\) children.push_back \(child2\);) s
+25.8 262 M (37:) s
+52.2 262 M
+(   return this;) s
+25.8 250 M (38:) s
+52.2 250 M
+(}) s
+25.8 238 M (39:) s
+25.8 226 M (40:) s
+52.2 226 M
+(astree* astree::adopt_sym \(astree* child, int symbol_\) {) s
+25.8 214 M (41:) s
+52.2 214 M
+(   symbol = symbol_;) s
+25.8 202 M (42:) s
+52.2 202 M
+(   return adopt \(child\);) s
+25.8 190 M (43:) s
+52.2 190 M
+(}) s
+25.8 178 M (44:) s
+_R
+S
+%%Page: (2) 3
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (astree.cpp) def
+/fdir (.) def
+/ftail (astree.cpp) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (45:) s
+25.8 682 M (46:) s
+52.2 682 M
+(void astree::dump_node \(FILE* outfile\) {) s
+25.8 670 M (47:) s
+52.2 670 M
+(   fprintf \(outfile, "%p->{%s %zd.%zd.%zd \\"%s\\":",) s
+25.8 658 M (48:) s
+52.2 658 M
+(            this, parser::get_tname \(symbol\),) s
+25.8 646 M (49:) s
+52.2 646 M
+(            lloc.filenr, lloc.linenr, lloc.offset,) s
+25.8 634 M (50:) s
+52.2 634 M
+(            lexinfo->c_str\(\)\);) s
+25.8 622 M (51:) s
+52.2 622 M
+(   for \(size_t child = 0; child < children.size\(\); ++child\) {) s
+25.8 610 M (52:) s
+52.2 610 M
+(      fprintf \(outfile, " %p", children.at\(child\)\);) s
+25.8 598 M (53:) s
+52.2 598 M
+(   }) s
+25.8 586 M (54:) s
+52.2 586 M
+(}) s
+25.8 574 M (55:) s
+25.8 562 M (56:) s
+52.2 562 M
+(void astree::dump_tree \(FILE* outfile, int depth\) {) s
+25.8 550 M (57:) s
+52.2 550 M
+(   fprintf \(outfile, "%*s", depth * 3, ""\);) s
+25.8 538 M (58:) s
+52.2 538 M
+(   dump_node \(outfile\);) s
+25.8 526 M (59:) s
+52.2 526 M
+(   fprintf \(outfile, "\\n"\);) s
+25.8 514 M (60:) s
+52.2 514 M
+(   for \(astree* child: children\) child->dump_tree \(outfile, depth + 1\);) s
+25.8 502 M (61:) s
+52.2 502 M
+(   fflush \(NULL\);) s
+25.8 490 M (62:) s
+52.2 490 M
+(}) s
+25.8 478 M (63:) s
+25.8 466 M (64:) s
+52.2 466 M
+(void astree::dump \(FILE* outfile, astree* tree\) {) s
+25.8 454 M (65:) s
+52.2 454 M
+(   if \(tree == nullptr\) fprintf \(outfile, "nullptr"\);) s
+25.8 442 M (66:) s
+52.2 442 M
+(                   else tree->dump_node \(outfile\);) s
+25.8 430 M (67:) s
+52.2 430 M
+(}) s
+25.8 418 M (68:) s
+25.8 406 M (69:) s
+52.2 406 M
+(void astree::print \(FILE* outfile, astree* tree, int depth\) {) s
+25.8 394 M (70:) s
+52.2 394 M
+(   fprintf \(outfile, "; %*s", depth * 3, ""\);) s
+25.8 382 M (71:) s
+52.2 382 M
+(   fprintf \(outfile, "%s \\"%s\\" \(%zd.%zd.%zd\)\\n",) s
+25.8 370 M (72:) s
+52.2 370 M
+(            parser::get_tname \(tree->symbol\), tree->lexinfo->c_str\(\),) s
+25.8 358 M (73:) s
+52.2 358 M
+(            tree->lloc.filenr, tree->lloc.linenr, tree->lloc.offset\);) s
+25.8 346 M (74:) s
+52.2 346 M
+(   for \(astree* child: tree->children\) {) s
+25.8 334 M (75:) s
+52.2 334 M
+(      astree::print \(outfile, child, depth + 1\);) s
+25.8 322 M (76:) s
+52.2 322 M
+(   }) s
+25.8 310 M (77:) s
+52.2 310 M
+(}) s
+25.8 298 M (78:) s
+25.8 286 M (79:) s
+52.2 286 M
+(void destroy \(astree* tree1, astree* tree2\) {) s
+25.8 274 M (80:) s
+52.2 274 M
+(   if \(tree1 != nullptr\) delete tree1;) s
+25.8 262 M (81:) s
+52.2 262 M
+(   if \(tree2 != nullptr\) delete tree2;) s
+25.8 250 M (82:) s
+52.2 250 M
+(}) s
+25.8 238 M (83:) s
+25.8 226 M (84:) s
+52.2 226 M
+(void errllocprintf \(const location& lloc, const char* format,) s
+25.8 214 M (85:) s
+52.2 214 M
+(                    const char* arg\) {) s
+25.8 202 M (86:) s
+52.2 202 M
+(   static char buffer[0x1000];) s
+25.8 190 M (87:) s
+52.2 190 M
+(   assert \(sizeof buffer > strlen \(format\) + strlen \(arg\)\);) s
+25.8 178 M (88:) s
+52.2 178 M
+(   snprintf \(buffer, sizeof buffer, format, arg\);) s
+25.8 166 M (89:) s
+52.2 166 M
+(   errprintf \("%s:%zd.%zd: %s", ) s
+25.8 154 M (90:) s
+52.2 154 M
+(              lexer::filename \(lloc.filenr\), lloc.linenr, lloc.offset,) s
+25.8 142 M (91:) s
+52.2 142 M
+(              buffer\);) s
+25.8 130 M (92:) s
+52.2 130 M
+(}) s
+_R
+S
+%%Page: (1) 4
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (auxlib.h) def
+/fdir (.) def
+/ftail (auxlib.h) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/06/16) def
+/pagecountstr (/2) def
+/modtimestr (16:41:48) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(#ifndef __AUXLIB_H__) s
+32.4 682 M (2:) s
+52.2 682 M
+(#define __AUXLIB_H__) s
+32.4 670 M (3:) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <string>) s
+32.4 646 M (5:) s
+52.2 646 M
+(using namespace std;) s
+32.4 634 M (6:) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <stdarg.h>) s
+32.4 610 M (8:) s
+32.4 598 M (9:) s
+52.2 598 M
+(//) s
+25.8 586 M (10:) s
+52.2 586 M
+(// DESCRIPTION) s
+25.8 574 M (11:) s
+52.2 574 M
+(//    Auxiliary library containing miscellaneous useful things.) s
+25.8 562 M (12:) s
+52.2 562 M
+(//) s
+25.8 550 M (13:) s
+25.8 538 M (14:) s
+52.2 538 M
+(//) s
+25.8 526 M (15:) s
+52.2 526 M
+(// Error message and exit status utility.) s
+25.8 514 M (16:) s
+52.2 514 M
+(//) s
+25.8 502 M (17:) s
+25.8 490 M (18:) s
+52.2 490 M
+(struct exec {) s
+25.8 478 M (19:) s
+52.2 478 M
+(   static string execname;) s
+25.8 466 M (20:) s
+52.2 466 M
+(   static int exit_status;) s
+25.8 454 M (21:) s
+52.2 454 M
+(};) s
+25.8 442 M (22:) s
+25.8 430 M (23:) s
+52.2 430 M
+(void veprintf \(const char* format, va_list args\);) s
+25.8 418 M (24:) s
+52.2 418 M
+(// Prints a message to stderr using the vector form of ) s
+25.8 406 M (25:) s
+52.2 406 M
+(// argument list.) s
+25.8 394 M (26:) s
+25.8 382 M (27:) s
+52.2 382 M
+(void eprintf \(const char* format, ...\);) s
+25.8 370 M (28:) s
+52.2 370 M
+(// Print a message to stderr according to the printf format) s
+25.8 358 M (29:) s
+52.2 358 M
+(// specified.  Usually called for debug output.) s
+25.8 346 M (30:) s
+52.2 346 M
+(// Precedes the message by the program name if the format) s
+25.8 334 M (31:) s
+52.2 334 M
+(// begins with the characters `%:'.) s
+25.8 322 M (32:) s
+25.8 310 M (33:) s
+52.2 310 M
+(void errprintf \(const char* format, ...\);) s
+25.8 298 M (34:) s
+52.2 298 M
+(// Print an error message according to the printf format) s
+25.8 286 M (35:) s
+52.2 286 M
+(// specified, using eprintf.) s
+25.8 274 M (36:) s
+52.2 274 M
+(// Sets the exitstatus to EXIT_FAILURE.) s
+25.8 262 M (37:) s
+25.8 250 M (38:) s
+52.2 250 M
+(void syserrprintf \(const char* object\);) s
+25.8 238 M (39:) s
+52.2 238 M
+(// Print a message resulting from a bad system call.  The) s
+25.8 226 M (40:) s
+52.2 226 M
+(// object is the name of the object causing the problem and) s
+25.8 214 M (41:) s
+52.2 214 M
+(// the reason is taken from the external variable errno.) s
+25.8 202 M (42:) s
+52.2 202 M
+(// Sets the exit status to EXIT_FAILURE.) s
+25.8 190 M (43:) s
+25.8 178 M (44:) s
+52.2 178 M
+(void eprint_status \(const char* command, int status\);) s
+25.8 166 M (45:) s
+52.2 166 M
+(// Print the status returned by wait\(2\) from a subprocess.) s
+25.8 154 M (46:) s
+_R
+S
+%%Page: (2) 5
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (auxlib.h) def
+/fdir (.) def
+/ftail (auxlib.h) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/06/16) def
+/pagecountstr (/2) def
+/modtimestr (16:41:48) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (47:) s
+25.8 682 M (48:) s
+52.2 682 M
+(//) s
+25.8 670 M (49:) s
+52.2 670 M
+(// Support for stub messages.) s
+25.8 658 M (50:) s
+52.2 658 M
+(//) s
+25.8 646 M (51:) s
+52.2 646 M
+(#define STUBPRINTF\(...\) \\) s
+25.8 634 M (52:) s
+52.2 634 M
+(        __stubprintf \(__FILE__, __LINE__, __func__, __VA_ARGS__\)) s
+25.8 622 M (53:) s
+52.2 622 M
+(void __stubprintf \(const char* file, int line, const char* func,) s
+25.8 610 M (54:) s
+52.2 610 M
+(                   const char* format, ...\);) s
+25.8 598 M (55:) s
+25.8 586 M (56:) s
+52.2 586 M
+(//) s
+25.8 574 M (57:) s
+52.2 574 M
+(// Debugging utility.) s
+25.8 562 M (58:) s
+52.2 562 M
+(//) s
+25.8 550 M (59:) s
+25.8 538 M (60:) s
+52.2 538 M
+(void set_debugflags \(const char* flags\);) s
+25.8 526 M (61:) s
+52.2 526 M
+(// Sets a string of debug flags to be used by DEBUGF statements.) s
+25.8 514 M (62:) s
+52.2 514 M
+(// Uses the address of the string, and does not copy it, so) s
+25.8 502 M (63:) s
+52.2 502 M
+(// it must not be dangling.  If a particular debug flag has) s
+25.8 490 M (64:) s
+52.2 490 M
+(// been set, messages are printed.  The format is identical to) s
+25.8 478 M (65:) s
+52.2 478 M
+(// printf format.  The flag "@" turns on all flags.) s
+25.8 466 M (66:) s
+25.8 454 M (67:) s
+52.2 454 M
+(bool is_debugflag \(char flag\);) s
+25.8 442 M (68:) s
+52.2 442 M
+(// Checks to see if a debugflag is set.) s
+25.8 430 M (69:) s
+25.8 418 M (70:) s
+52.2 418 M
+(#ifdef NDEBUG) s
+25.8 406 M (71:) s
+52.2 406 M
+(// Do not generate any code.) s
+25.8 394 M (72:) s
+52.2 394 M
+(#define DEBUGF\(FLAG,...\)   /**/) s
+25.8 382 M (73:) s
+52.2 382 M
+(#define DEBUGSTMT\(FLAG,STMTS\) /**/) s
+25.8 370 M (74:) s
+52.2 370 M
+(#else) s
+25.8 358 M (75:) s
+52.2 358 M
+(// Generate debugging code.) s
+25.8 346 M (76:) s
+52.2 346 M
+(void __debugprintf \(char flag, const char* file, int line,) s
+25.8 334 M (77:) s
+52.2 334 M
+(                    const char* func, const char* format, ...\);) s
+25.8 322 M (78:) s
+52.2 322 M
+(#define DEBUGF\(FLAG,...\) \\) s
+25.8 310 M (79:) s
+52.2 310 M
+(        __debugprintf \(FLAG, __FILE__, __LINE__, __func__, \\) s
+25.8 298 M (80:) s
+52.2 298 M
+(                       __VA_ARGS__\)) s
+25.8 286 M (81:) s
+52.2 286 M
+(#define DEBUGSTMT\(FLAG,STMTS\) \\) s
+25.8 274 M (82:) s
+52.2 274 M
+(        if \(is_debugflag \(FLAG\)\) { DEBUGF \(FLAG, "\\n"\); STMTS }) s
+25.8 262 M (83:) s
+52.2 262 M
+(#endif) s
+25.8 250 M (84:) s
+25.8 238 M (85:) s
+52.2 238 M
+(#endif) s
+25.8 226 M (86:) s
+_R
+S
+%%Page: (1) 6
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (auxlib.cpp) def
+/fdir (.) def
+/ftail (auxlib.cpp) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/06/16) def
+/pagecountstr (/3) def
+/modtimestr (16:41:47) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+32.4 682 M (2:) s
+52.2 682 M
+(#include <assert.h>) s
+32.4 670 M (3:) s
+52.2 670 M
+(#include <errno.h>) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <libgen.h>) s
+32.4 646 M (5:) s
+52.2 646 M
+(#include <limits.h>) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include <stdarg.h>) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <stdio.h>) s
+32.4 610 M (8:) s
+52.2 610 M
+(#include <stdlib.h>) s
+32.4 598 M (9:) s
+52.2 598 M
+(#include <string.h>) s
+25.8 586 M (10:) s
+52.2 586 M
+(#include <wait.h>) s
+25.8 574 M (11:) s
+25.8 562 M (12:) s
+52.2 562 M
+(#include "auxlib.h") s
+25.8 550 M (13:) s
+25.8 538 M (14:) s
+52.2 538 M
+(string exec::execname;) s
+25.8 526 M (15:) s
+52.2 526 M
+(int exec::exit_status = EXIT_SUCCESS;) s
+25.8 514 M (16:) s
+25.8 502 M (17:) s
+52.2 502 M
+(const char* debugflags = "";) s
+25.8 490 M (18:) s
+52.2 490 M
+(bool alldebugflags = false;) s
+25.8 478 M (19:) s
+25.8 466 M (20:) s
+52.2 466 M
+(static void eprint_signal \(const char* kind, int signal\) {) s
+25.8 454 M (21:) s
+52.2 454 M
+(   eprintf \(", %s %d", kind, signal\);) s
+25.8 442 M (22:) s
+52.2 442 M
+(   const char* sigstr = strsignal \(signal\);) s
+25.8 430 M (23:) s
+52.2 430 M
+(   if \(sigstr != NULL\) fprintf \(stderr, " %s", sigstr\);) s
+25.8 418 M (24:) s
+52.2 418 M
+(}) s
+25.8 406 M (25:) s
+25.8 394 M (26:) s
+52.2 394 M
+(void eprint_status \(const char* command, int status\) {) s
+25.8 382 M (27:) s
+52.2 382 M
+(   if \(status == 0\) return; ) s
+25.8 370 M (28:) s
+52.2 370 M
+(   eprintf \("%s: status 0x%04X", command, status\);) s
+25.8 358 M (29:) s
+52.2 358 M
+(   if \(WIFEXITED \(status\)\) {) s
+25.8 346 M (30:) s
+52.2 346 M
+(      eprintf \(", exit %d", WEXITSTATUS \(status\)\);) s
+25.8 334 M (31:) s
+52.2 334 M
+(   }) s
+25.8 322 M (32:) s
+52.2 322 M
+(   if \(WIFSIGNALED \(status\)\) {) s
+25.8 310 M (33:) s
+52.2 310 M
+(      eprint_signal \("Terminated", WTERMSIG \(status\)\);) s
+25.8 298 M (34:) s
+52.2 298 M
+(      #ifdef WCOREDUMP) s
+25.8 286 M (35:) s
+52.2 286 M
+(      if \(WCOREDUMP \(status\)\) eprintf \(", core dumped"\);) s
+25.8 274 M (36:) s
+52.2 274 M
+(      #endif) s
+25.8 262 M (37:) s
+52.2 262 M
+(   }) s
+25.8 250 M (38:) s
+52.2 250 M
+(   if \(WIFSTOPPED \(status\)\) {) s
+25.8 238 M (39:) s
+52.2 238 M
+(      eprint_signal \("Stopped", WSTOPSIG \(status\)\);) s
+25.8 226 M (40:) s
+52.2 226 M
+(   }) s
+25.8 214 M (41:) s
+52.2 214 M
+(   if \(WIFCONTINUED \(status\)\) {) s
+25.8 202 M (42:) s
+52.2 202 M
+(      eprintf \(", Continued"\);) s
+25.8 190 M (43:) s
+52.2 190 M
+(   }) s
+25.8 178 M (44:) s
+52.2 178 M
+(   eprintf \("\\n"\);) s
+25.8 166 M (45:) s
+52.2 166 M
+(}) s
+25.8 154 M (46:) s
+25.8 142 M (47:) s
+52.2 142 M
+(void veprintf \(const char* format, va_list args\) {) s
+25.8 130 M (48:) s
+52.2 130 M
+(   assert \(exec::execname.size\(\) != 0\);) s
+25.8 118 M (49:) s
+52.2 118 M
+(   assert \(format != NULL\);) s
+25.8 106 M (50:) s
+52.2 106 M
+(   fflush \(NULL\);) s
+25.8 94 M (51:) s
+52.2 94 M
+(   if \(strstr \(format, "%:"\) == format\) {) s
+25.8 82 M (52:) s
+52.2 82 M
+(      fprintf \(stderr, "%s: ", exec::execname.c_str\(\)\);) s
+25.8 70 M (53:) s
+52.2 70 M
+(      format += 2;) s
+25.8 58 M (54:) s
+52.2 58 M
+(   }) s
+25.8 46 M (55:) s
+52.2 46 M
+(   vfprintf \(stderr, format, args\);) s
+25.8 34 M (56:) s
+52.2 34 M
+(   fflush \(NULL\);) s
+25.8 22 M (57:) s
+52.2 22 M
+(}) s
+25.8 10 M (58:) s
+_R
+S
+%%Page: (2) 7
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (auxlib.cpp) def
+/fdir (.) def
+/ftail (auxlib.cpp) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/06/16) def
+/pagecountstr (/3) def
+/modtimestr (16:41:47) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (59:) s
+52.2 694 M
+(void eprintf \(const char* format, ...\) {) s
+25.8 682 M (60:) s
+52.2 682 M
+(   va_list args;) s
+25.8 670 M (61:) s
+52.2 670 M
+(   va_start \(args, format\);) s
+25.8 658 M (62:) s
+52.2 658 M
+(   veprintf \(format, args\);) s
+25.8 646 M (63:) s
+52.2 646 M
+(   va_end \(args\);) s
+25.8 634 M (64:) s
+52.2 634 M
+(}) s
+25.8 622 M (65:) s
+25.8 610 M (66:) s
+52.2 610 M
+(void errprintf \(const char* format, ...\) {) s
+25.8 598 M (67:) s
+52.2 598 M
+(   va_list args;) s
+25.8 586 M (68:) s
+52.2 586 M
+(   va_start \(args, format\);) s
+25.8 574 M (69:) s
+52.2 574 M
+(   veprintf \(format, args\);) s
+25.8 562 M (70:) s
+52.2 562 M
+(   va_end \(args\);) s
+25.8 550 M (71:) s
+52.2 550 M
+(   exec::exit_status = EXIT_FAILURE;) s
+25.8 538 M (72:) s
+52.2 538 M
+(}) s
+25.8 526 M (73:) s
+25.8 514 M (74:) s
+52.2 514 M
+(void syserrprintf \(const char* object\) {) s
+25.8 502 M (75:) s
+52.2 502 M
+(   errprintf \("%:%s: %s\\n", object, strerror \(errno\)\);) s
+25.8 490 M (76:) s
+52.2 490 M
+(}) s
+25.8 478 M (77:) s
+25.8 466 M (78:) s
+52.2 466 M
+(void __stubprintf \(const char* file, int line, const char* func,) s
+25.8 454 M (79:) s
+52.2 454 M
+(                   const char* format, ...\) {) s
+25.8 442 M (80:) s
+52.2 442 M
+(   va_list args;) s
+25.8 430 M (81:) s
+52.2 430 M
+(   fflush \(NULL\);) s
+25.8 418 M (82:) s
+52.2 418 M
+(   printf \("%s: %s[%d] %s: ", exec::execname.c_str\(\), file, line, func\);) s
+25.8 406 M (83:) s
+52.2 406 M
+(   va_start \(args, format\);) s
+25.8 394 M (84:) s
+52.2 394 M
+(   vprintf \(format, args\);) s
+25.8 382 M (85:) s
+52.2 382 M
+(   va_end \(args\);) s
+25.8 370 M (86:) s
+52.2 370 M
+(   fflush \(NULL\);) s
+25.8 358 M (87:) s
+52.2 358 M
+(}     ) s
+25.8 346 M (88:) s
+_R
+S
+%%Page: (3) 8
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 3 def
+/fname (auxlib.cpp) def
+/fdir (.) def
+/ftail (auxlib.cpp) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (10/06/16) def
+/pagecountstr (/3) def
+/modtimestr (16:41:47) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (89:) s
+25.8 682 M (90:) s
+52.2 682 M
+(void set_debugflags \(const char* flags\) {) s
+25.8 670 M (91:) s
+52.2 670 M
+(   debugflags = flags;) s
+25.8 658 M (92:) s
+52.2 658 M
+(   if \(strchr \(debugflags, '@'\) != NULL\) alldebugflags = true;) s
+25.8 646 M (93:) s
+52.2 646 M
+(   DEBUGF \('x', "Debugflags = \\"%s\\", all = %d\\n",) s
+25.8 634 M (94:) s
+52.2 634 M
+(           debugflags, alldebugflags\);) s
+25.8 622 M (95:) s
+52.2 622 M
+(}) s
+25.8 610 M (96:) s
+25.8 598 M (97:) s
+52.2 598 M
+(bool is_debugflag \(char flag\) {) s
+25.8 586 M (98:) s
+52.2 586 M
+(   return alldebugflags or strchr \(debugflags, flag\) != NULL;) s
+25.8 574 M (99:) s
+52.2 574 M
+(}) s
+19.2 562 M (100:) s
+19.2 550 M (101:) s
+52.2 550 M
+(void __debugprintf \(char flag, const char* file, int line,) s
+19.2 538 M (102:) s
+52.2 538 M
+(                    const char* func, const char* format, ...\) {) s
+19.2 526 M (103:) s
+52.2 526 M
+(   va_list args;) s
+19.2 514 M (104:) s
+52.2 514 M
+(   if \(not is_debugflag \(flag\)\) return;) s
+19.2 502 M (105:) s
+52.2 502 M
+(   fflush \(NULL\);) s
+19.2 490 M (106:) s
+52.2 490 M
+(   va_start \(args, format\);) s
+19.2 478 M (107:) s
+52.2 478 M
+(   fprintf \(stderr, "DEBUGF\(%c\): %s[%d] %s\(\):\\n",) s
+19.2 466 M (108:) s
+52.2 466 M
+(             flag, file, line, func\);) s
+19.2 454 M (109:) s
+52.2 454 M
+(   vfprintf \(stderr, format, args\);) s
+19.2 442 M (110:) s
+52.2 442 M
+(   va_end \(args\);) s
+19.2 430 M (111:) s
+52.2 430 M
+(   fflush \(NULL\);) s
+19.2 418 M (112:) s
+52.2 418 M
+(}) s
+19.2 406 M (113:) s
+_R
+S
+%%Page: (1) 9
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (lyutils.h) def
+/fdir (.) def
+/ftail (lyutils.h) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/1) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: lyutils.h,v 1.10 2016-10-06 16:42:53-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#ifndef __UTILS_H__) s
+32.4 658 M (4:) s
+52.2 658 M
+(#define __UTILS_H__) s
+32.4 646 M (5:) s
+32.4 634 M (6:) s
+52.2 634 M
+(// Lex and Yacc interface utility.) s
+32.4 622 M (7:) s
+32.4 610 M (8:) s
+52.2 610 M
+(#include <string>) s
+32.4 598 M (9:) s
+52.2 598 M
+(#include <vector>) s
+25.8 586 M (10:) s
+52.2 586 M
+(using namespace std;) s
+25.8 574 M (11:) s
+25.8 562 M (12:) s
+52.2 562 M
+(#include <stdio.h>) s
+25.8 550 M (13:) s
+25.8 538 M (14:) s
+52.2 538 M
+(#include "astree.h") s
+25.8 526 M (15:) s
+52.2 526 M
+(#include "auxlib.h") s
+25.8 514 M (16:) s
+25.8 502 M (17:) s
+52.2 502 M
+(extern FILE* yyin;) s
+25.8 490 M (18:) s
+52.2 490 M
+(extern char* yytext; ) s
+25.8 478 M (19:) s
+52.2 478 M
+(extern int yy_flex_debug;) s
+25.8 466 M (20:) s
+52.2 466 M
+(extern int yydebug;) s
+25.8 454 M (21:) s
+52.2 454 M
+(extern size_t yyleng; ) s
+25.8 442 M (22:) s
+25.8 430 M (23:) s
+52.2 430 M
+(int yylex\(\);) s
+25.8 418 M (24:) s
+52.2 418 M
+(int yylex_destroy\(\);) s
+25.8 406 M (25:) s
+52.2 406 M
+(int yyparse\(\);) s
+25.8 394 M (26:) s
+52.2 394 M
+(void yyerror \(const char* message\);) s
+25.8 382 M (27:) s
+25.8 370 M (28:) s
+52.2 370 M
+(struct lexer {) s
+25.8 358 M (29:) s
+52.2 358 M
+(   static bool interactive;) s
+25.8 346 M (30:) s
+52.2 346 M
+(   static location lloc;) s
+25.8 334 M (31:) s
+52.2 334 M
+(   static size_t last_yyleng;) s
+25.8 322 M (32:) s
+52.2 322 M
+(   static vector<string> filenames;) s
+25.8 310 M (33:) s
+52.2 310 M
+(   static const string* filename \(int filenr\);) s
+25.8 298 M (34:) s
+52.2 298 M
+(   static void newfilename \(const string& filename\);) s
+25.8 286 M (35:) s
+52.2 286 M
+(   static void advance\(\);) s
+25.8 274 M (36:) s
+52.2 274 M
+(   static void newline\(\);) s
+25.8 262 M (37:) s
+52.2 262 M
+(   static void badchar \(unsigned char bad\);) s
+25.8 250 M (38:) s
+52.2 250 M
+(   static void badtoken \(char* lexeme\);) s
+25.8 238 M (39:) s
+52.2 238 M
+(   static void include\(\);) s
+25.8 226 M (40:) s
+52.2 226 M
+(};) s
+25.8 214 M (41:) s
+25.8 202 M (42:) s
+52.2 202 M
+(struct parser {) s
+25.8 190 M (43:) s
+52.2 190 M
+(   static astree* root;) s
+25.8 178 M (44:) s
+52.2 178 M
+(   static const char* get_tname \(int symbol\);) s
+25.8 166 M (45:) s
+52.2 166 M
+(};) s
+25.8 154 M (46:) s
+25.8 142 M (47:) s
+52.2 142 M
+(#define YYSTYPE astree*) s
+25.8 130 M (48:) s
+52.2 130 M
+(#include "yyparse.h") s
+25.8 118 M (49:) s
+25.8 106 M (50:) s
+52.2 106 M
+(#endif) s
+25.8 94 M (51:) s
+_R
+S
+%%Page: (1) 10
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (lyutils.cpp) def
+/fdir (.) def
+/ftail (lyutils.cpp) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: lyutils.cpp,v 1.11 2016-10-06 16:42:53-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#include <assert.h>) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <ctype.h>) s
+32.4 646 M (5:) s
+52.2 646 M
+(#include <stdio.h>) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include <stdlib.h>) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <string.h>) s
+32.4 610 M (8:) s
+32.4 598 M (9:) s
+52.2 598 M
+(#include "auxlib.h") s
+25.8 586 M (10:) s
+52.2 586 M
+(#include "lyutils.h") s
+25.8 574 M (11:) s
+25.8 562 M (12:) s
+52.2 562 M
+(bool lexer::interactive = true;) s
+25.8 550 M (13:) s
+52.2 550 M
+(location lexer::lloc = {0, 1, 0};) s
+25.8 538 M (14:) s
+52.2 538 M
+(size_t lexer::last_yyleng = 0;) s
+25.8 526 M (15:) s
+52.2 526 M
+(vector<string> lexer::filenames;) s
+25.8 514 M (16:) s
+25.8 502 M (17:) s
+52.2 502 M
+(astree* parser::root = nullptr;) s
+25.8 490 M (18:) s
+25.8 478 M (19:) s
+52.2 478 M
+(const string* lexer::filename \(int filenr\) {) s
+25.8 466 M (20:) s
+52.2 466 M
+(   return &lexer::filenames.at\(filenr\);) s
+25.8 454 M (21:) s
+52.2 454 M
+(}) s
+25.8 442 M (22:) s
+25.8 430 M (23:) s
+52.2 430 M
+(void lexer::newfilename \(const string& filename\) {) s
+25.8 418 M (24:) s
+52.2 418 M
+(   lexer::lloc.filenr = lexer::filenames.size\(\);) s
+25.8 406 M (25:) s
+52.2 406 M
+(   lexer::filenames.push_back \(filename\);) s
+25.8 394 M (26:) s
+52.2 394 M
+(}) s
+25.8 382 M (27:) s
+25.8 370 M (28:) s
+52.2 370 M
+(void lexer::advance\(\) {) s
+25.8 358 M (29:) s
+52.2 358 M
+(   if \(not interactive\) {) s
+25.8 346 M (30:) s
+52.2 346 M
+(      if \(lexer::lloc.offset == 0\) {) s
+25.8 334 M (31:) s
+52.2 334 M
+(         printf \(";%2zd.%3zd: ",) s
+25.8 322 M (32:) s
+52.2 322 M
+(                 lexer::lloc.filenr, lexer::lloc.linenr\);) s
+25.8 310 M (33:) s
+52.2 310 M
+(      }) s
+25.8 298 M (34:) s
+52.2 298 M
+(      printf \("%s", yytext\);) s
+25.8 286 M (35:) s
+52.2 286 M
+(   }) s
+25.8 274 M (36:) s
+52.2 274 M
+(   lexer::lloc.offset += last_yyleng;) s
+25.8 262 M (37:) s
+52.2 262 M
+(   last_yyleng = yyleng;) s
+25.8 250 M (38:) s
+52.2 250 M
+(}) s
+25.8 238 M (39:) s
+25.8 226 M (40:) s
+52.2 226 M
+(void lexer::newline\(\) {) s
+25.8 214 M (41:) s
+52.2 214 M
+(   ++lexer::lloc.linenr;) s
+25.8 202 M (42:) s
+52.2 202 M
+(   lexer::lloc.offset = 0;) s
+25.8 190 M (43:) s
+52.2 190 M
+(}) s
+25.8 178 M (44:) s
+25.8 166 M (45:) s
+52.2 166 M
+(void lexer::badchar \(unsigned char bad\) {) s
+25.8 154 M (46:) s
+52.2 154 M
+(   char buffer[16];) s
+25.8 142 M (47:) s
+52.2 142 M
+(   snprintf \(buffer, sizeof buffer,) s
+25.8 130 M (48:) s
+52.2 130 M
+(             isgraph \(bad\) ? "%c" : "\\\\%03o", bad\);) s
+25.8 118 M (49:) s
+52.2 118 M
+(   errllocprintf \(lexer::lloc, "invalid source character \(%s\)\\n",) s
+25.8 106 M (50:) s
+52.2 106 M
+(                  buffer\);) s
+25.8 94 M (51:) s
+52.2 94 M
+(}) s
+25.8 82 M (52:) s
+_R
+S
+%%Page: (2) 11
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (lyutils.cpp) def
+/fdir (.) def
+/ftail (lyutils.cpp) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (53:) s
+25.8 682 M (54:) s
+52.2 682 M
+(void lexer::badtoken \(char* lexeme\) {) s
+25.8 670 M (55:) s
+52.2 670 M
+(   errllocprintf \(lexer::lloc, "invalid token \(%s\)\\n", lexeme\);) s
+25.8 658 M (56:) s
+52.2 658 M
+(}) s
+25.8 646 M (57:) s
+25.8 634 M (58:) s
+52.2 634 M
+(void lexer::include\(\) {) s
+25.8 622 M (59:) s
+52.2 622 M
+(   size_t linenr;) s
+25.8 610 M (60:) s
+52.2 610 M
+(   static char filename[0x1000];) s
+25.8 598 M (61:) s
+52.2 598 M
+(   assert \(sizeof filename > strlen \(yytext\)\);) s
+25.8 586 M (62:) s
+52.2 586 M
+(   int scan_rc = sscanf \(yytext, "# %zd \\"%[^\\"]\\"", &linenr, filename\);) s
+25.8 574 M (63:) s
+52.2 574 M
+(   if \(scan_rc != 2\) {) s
+25.8 562 M (64:) s
+52.2 562 M
+(      errprintf \("%s: invalid directive, ignored\\n", yytext\);) s
+25.8 550 M (65:) s
+52.2 550 M
+(   }else {) s
+25.8 538 M (66:) s
+52.2 538 M
+(      if \(yy_flex_debug\) {) s
+25.8 526 M (67:) s
+52.2 526 M
+(         fprintf \(stderr, "--included # %zd \\"%s\\"\\n",) s
+25.8 514 M (68:) s
+52.2 514 M
+(                  linenr, filename\);) s
+25.8 502 M (69:) s
+52.2 502 M
+(      }) s
+25.8 490 M (70:) s
+52.2 490 M
+(      lexer::lloc.linenr = linenr - 1;) s
+25.8 478 M (71:) s
+52.2 478 M
+(      lexer::newfilename \(filename\);) s
+25.8 466 M (72:) s
+52.2 466 M
+(   }) s
+25.8 454 M (73:) s
+52.2 454 M
+(}) s
+25.8 442 M (74:) s
+25.8 430 M (75:) s
+52.2 430 M
+(void yyerror \(const char* message\) {) s
+25.8 418 M (76:) s
+52.2 418 M
+(   assert \(not lexer::filenames.empty\(\)\);) s
+25.8 406 M (77:) s
+52.2 406 M
+(   errllocprintf \(lexer::lloc, "%s\\n", message\);) s
+25.8 394 M (78:) s
+52.2 394 M
+(}) s
+25.8 382 M (79:) s
+_R
+S
+%%Page: (1) 12
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (string_set.h) def
+/fdir (.) def
+/ftail (string_set.h) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/1) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: string_set.h,v 1.1 2016-10-06 16:15:22-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#ifndef __STRING_SET__) s
+32.4 658 M (4:) s
+52.2 658 M
+(#define __STRING_SET__) s
+32.4 646 M (5:) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include <string>) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include <unordered_set>) s
+32.4 610 M (8:) s
+52.2 610 M
+(using namespace std;) s
+32.4 598 M (9:) s
+25.8 586 M (10:) s
+52.2 586 M
+(#include <stdio.h>) s
+25.8 574 M (11:) s
+25.8 562 M (12:) s
+52.2 562 M
+(struct string_set {) s
+25.8 550 M (13:) s
+52.2 550 M
+(   string_set\(\);) s
+25.8 538 M (14:) s
+52.2 538 M
+(   static unordered_set<string> set;) s
+25.8 526 M (15:) s
+52.2 526 M
+(   static const string* intern \(const char*\);) s
+25.8 514 M (16:) s
+52.2 514 M
+(   static void dump \(FILE*\);) s
+25.8 502 M (17:) s
+52.2 502 M
+(};) s
+25.8 490 M (18:) s
+25.8 478 M (19:) s
+52.2 478 M
+(#endif) s
+25.8 466 M (20:) s
+_R
+S
+%%Page: (1) 13
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (string_set.cpp) def
+/fdir (.) def
+/ftail (string_set.cpp) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/1) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(// $Id: string_set.cpp,v 1.2 2016-10-06 16:42:53-07 - - $) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(#include <string>) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <unordered_set>) s
+32.4 646 M (5:) s
+52.2 646 M
+(using namespace std;) s
+32.4 634 M (6:) s
+32.4 622 M (7:) s
+52.2 622 M
+(#include "string_set.h") s
+32.4 610 M (8:) s
+32.4 598 M (9:) s
+52.2 598 M
+(unordered_set<string> string_set::set;) s
+25.8 586 M (10:) s
+25.8 574 M (11:) s
+52.2 574 M
+(string_set::string_set\(\) {) s
+25.8 562 M (12:) s
+52.2 562 M
+(   set.max_load_factor \(0.5\);) s
+25.8 550 M (13:) s
+52.2 550 M
+(}) s
+25.8 538 M (14:) s
+25.8 526 M (15:) s
+52.2 526 M
+(const string* string_set::intern \(const char* string\) {) s
+25.8 514 M (16:) s
+52.2 514 M
+(   auto handle = set.insert \(string\);) s
+25.8 502 M (17:) s
+52.2 502 M
+(   return &*handle.first;) s
+25.8 490 M (18:) s
+52.2 490 M
+(}) s
+25.8 478 M (19:) s
+25.8 466 M (20:) s
+52.2 466 M
+(void string_set::dump \(FILE* out\) {) s
+25.8 454 M (21:) s
+52.2 454 M
+(   static unordered_set<string>::hasher hash_fn) s
+25.8 442 M (22:) s
+52.2 442 M
+(               = string_set::set.hash_function\(\);) s
+25.8 430 M (23:) s
+52.2 430 M
+(   size_t max_bucket_size = 0;) s
+25.8 418 M (24:) s
+52.2 418 M
+(   for \(size_t bucket = 0; bucket < set.bucket_count\(\); ++bucket\) {) s
+25.8 406 M (25:) s
+52.2 406 M
+(      bool need_index = true;) s
+25.8 394 M (26:) s
+52.2 394 M
+(      size_t curr_size = set.bucket_size \(bucket\);) s
+25.8 382 M (27:) s
+52.2 382 M
+(      if \(max_bucket_size < curr_size\) max_bucket_size = curr_size;) s
+25.8 370 M (28:) s
+52.2 370 M
+(      for \(auto itor = set.cbegin \(bucket\);) s
+25.8 358 M (29:) s
+52.2 358 M
+(           itor != set.cend \(bucket\); ++itor\) {) s
+25.8 346 M (30:) s
+52.2 346 M
+(         if \(need_index\) fprintf \(out, "string_set[%4zu]: ", bucket\);) s
+25.8 334 M (31:) s
+52.2 334 M
+(                    else fprintf \(out, "          %4s   ", ""\);) s
+25.8 322 M (32:) s
+52.2 322 M
+(         need_index = false;) s
+25.8 310 M (33:) s
+52.2 310 M
+(         const string* str = &*itor;) s
+25.8 298 M (34:) s
+52.2 298 M
+(         fprintf \(out, "%22zu %p->\\"%s\\"\\n", hash_fn\(*str\),) s
+25.8 286 M (35:) s
+52.2 286 M
+(                  str, str->c_str\(\)\);) s
+25.8 274 M (36:) s
+52.2 274 M
+(      }) s
+25.8 262 M (37:) s
+52.2 262 M
+(   }) s
+25.8 250 M (38:) s
+52.2 250 M
+(   fprintf \(out, "load_factor = %.3f\\n", set.load_factor\(\)\);) s
+25.8 238 M (39:) s
+52.2 238 M
+(   fprintf \(out, "bucket_count = %zu\\n", set.bucket_count\(\)\);) s
+25.8 226 M (40:) s
+52.2 226 M
+(   fprintf \(out, "max_bucket_size = %zu\\n", max_bucket_size\);) s
+25.8 214 M (41:) s
+52.2 214 M
+(}) s
+25.8 202 M (42:) s
+_R
+S
+%%Page: (1) 14
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (yyparse.h) def
+/fdir (.) def
+/ftail (yyparse.h) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(/* A Bison parser, made by GNU Bison 2.7.  */) s
+32.4 682 M (2:) s
+32.4 670 M (3:) s
+52.2 670 M
+(/* Bison interface for Yacc-like parsers in C) s
+32.4 658 M (4:) s
+52.2 658 M
+(   ) s
+32.4 646 M (5:) s
+52.2 646 M
+(      Copyright \(C\) 1984, 1989-1990, 2000-2012 Free Software Foundation,) s
+5 634 M
+( Inc.) s
+32.4 622 M (6:) s
+52.2 622 M
+(   ) s
+32.4 610 M (7:) s
+52.2 610 M
+(   This program is free software: you can redistribute it and/or modify) s
+32.4 598 M (8:) s
+52.2 598 M
+(   it under the terms of the GNU General Public License as published by) s
+32.4 586 M (9:) s
+52.2 586 M
+(   the Free Software Foundation, either version 3 of the License, or) s
+25.8 574 M (10:) s
+52.2 574 M
+(   \(at your option\) any later version.) s
+25.8 562 M (11:) s
+52.2 562 M
+(   ) s
+25.8 550 M (12:) s
+52.2 550 M
+(   This program is distributed in the hope that it will be useful,) s
+25.8 538 M (13:) s
+52.2 538 M
+(   but WITHOUT ANY WARRANTY; without even the implied warranty of) s
+25.8 526 M (14:) s
+52.2 526 M
+(   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the) s
+25.8 514 M (15:) s
+52.2 514 M
+(   GNU General Public License for more details.) s
+25.8 502 M (16:) s
+52.2 502 M
+(   ) s
+25.8 490 M (17:) s
+52.2 490 M
+(   You should have received a copy of the GNU General Public License) s
+25.8 478 M (18:) s
+52.2 478 M
+(   along with this program.  If not, see <http://www.gnu.org/licenses/>.) s
+5 466 M
+(  */) s
+25.8 454 M (19:) s
+25.8 442 M (20:) s
+52.2 442 M
+(/* As a special exception, you may create a larger work that contains) s
+25.8 430 M (21:) s
+52.2 430 M
+(   part or all of the Bison parser skeleton and distribute that work) s
+25.8 418 M (22:) s
+52.2 418 M
+(   under terms of your choice, so long as that work isn't itself a) s
+25.8 406 M (23:) s
+52.2 406 M
+(   parser generator using the skeleton or a modified version thereof) s
+25.8 394 M (24:) s
+52.2 394 M
+(   as a parser skeleton.  Alternatively, if you modify or redistribute) s
+25.8 382 M (25:) s
+52.2 382 M
+(   the parser skeleton itself, you may \(at your option\) remove this) s
+25.8 370 M (26:) s
+52.2 370 M
+(   special exception, which will cause the skeleton and the resulting) s
+25.8 358 M (27:) s
+52.2 358 M
+(   Bison output files to be licensed under the GNU General Public) s
+25.8 346 M (28:) s
+52.2 346 M
+(   License without this special exception.) s
+25.8 334 M (29:) s
+52.2 334 M
+(   ) s
+25.8 322 M (30:) s
+52.2 322 M
+(   This special exception was added by the Free Software Foundation in) s
+25.8 310 M (31:) s
+52.2 310 M
+(   version 2.2 of Bison.  */) s
+25.8 298 M (32:) s
+25.8 286 M (33:) s
+52.2 286 M
+(#ifndef YY_YY_YYPARSE_H_INCLUDED) s
+25.8 274 M (34:) s
+52.2 274 M
+(# define YY_YY_YYPARSE_H_INCLUDED) s
+25.8 262 M (35:) s
+52.2 262 M
+(/* Enabling traces.  */) s
+25.8 250 M (36:) s
+52.2 250 M
+(#ifndef YYDEBUG) s
+25.8 238 M (37:) s
+52.2 238 M
+(# define YYDEBUG 1) s
+25.8 226 M (38:) s
+52.2 226 M
+(#endif) s
+25.8 214 M (39:) s
+52.2 214 M
+(#if YYDEBUG) s
+25.8 202 M (40:) s
+52.2 202 M
+(extern int yydebug;) s
+25.8 190 M (41:) s
+52.2 190 M
+(#endif) s
+25.8 178 M (42:) s
+25.8 166 M (43:) s
+52.2 166 M
+(/* Tokens.  */) s
+25.8 154 M (44:) s
+52.2 154 M
+(#ifndef YYTOKENTYPE) s
+25.8 142 M (45:) s
+52.2 142 M
+(# define YYTOKENTYPE) s
+25.8 130 M (46:) s
+52.2 130 M
+(   /* Put the tokens into the symbol table, so that GDB and other debugg) s
+5 118 M
+(ers) s
+25.8 106 M (47:) s
+52.2 106 M
+(      know about them.  */) s
+25.8 94 M (48:) s
+52.2 94 M
+(   enum yytokentype {) s
+25.8 82 M (49:) s
+52.2 82 M
+(     TOK_VOID = 258,) s
+25.8 70 M (50:) s
+52.2 70 M
+(     TOK_CHAR = 259,) s
+25.8 58 M (51:) s
+52.2 58 M
+(     TOK_INT = 260,) s
+25.8 46 M (52:) s
+52.2 46 M
+(     TOK_STRING = 261,) s
+25.8 34 M (53:) s
+52.2 34 M
+(     TOK_IF = 262,) s
+25.8 22 M (54:) s
+52.2 22 M
+(     TOK_ELSE = 263,) s
+25.8 10 M (55:) s
+52.2 10 M
+(     TOK_WHILE = 264,) s
+_R
+S
+%%Page: (2) 15
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (yyparse.h) def
+/fdir (.) def
+/ftail (yyparse.h) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:19) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (56:) s
+52.2 694 M
+(     TOK_RETURN = 265,) s
+25.8 682 M (57:) s
+52.2 682 M
+(     TOK_STRUCT = 266,) s
+25.8 670 M (58:) s
+52.2 670 M
+(     TOK_NULL = 267,) s
+25.8 658 M (59:) s
+52.2 658 M
+(     TOK_NEW = 268,) s
+25.8 646 M (60:) s
+52.2 646 M
+(     TOK_ARRAY = 269,) s
+25.8 634 M (61:) s
+52.2 634 M
+(     TOK_EQ = 270,) s
+25.8 622 M (62:) s
+52.2 622 M
+(     TOK_NE = 271,) s
+25.8 610 M (63:) s
+52.2 610 M
+(     TOK_LT = 272,) s
+25.8 598 M (64:) s
+52.2 598 M
+(     TOK_LE = 273,) s
+25.8 586 M (65:) s
+52.2 586 M
+(     TOK_GT = 274,) s
+25.8 574 M (66:) s
+52.2 574 M
+(     TOK_GE = 275,) s
+25.8 562 M (67:) s
+52.2 562 M
+(     TOK_IDENT = 276,) s
+25.8 550 M (68:) s
+52.2 550 M
+(     TOK_INTCON = 277,) s
+25.8 538 M (69:) s
+52.2 538 M
+(     TOK_CHARCON = 278,) s
+25.8 526 M (70:) s
+52.2 526 M
+(     TOK_STRINGCON = 279,) s
+25.8 514 M (71:) s
+52.2 514 M
+(     TOK_BLOCK = 280,) s
+25.8 502 M (72:) s
+52.2 502 M
+(     TOK_CALL = 281,) s
+25.8 490 M (73:) s
+52.2 490 M
+(     TOK_IFELSE = 282,) s
+25.8 478 M (74:) s
+52.2 478 M
+(     TOK_INITDECL = 283,) s
+25.8 466 M (75:) s
+52.2 466 M
+(     TOK_POS = 284,) s
+25.8 454 M (76:) s
+52.2 454 M
+(     TOK_NEG = 285,) s
+25.8 442 M (77:) s
+52.2 442 M
+(     TOK_NEWARRAY = 286,) s
+25.8 430 M (78:) s
+52.2 430 M
+(     TOK_TYPEID = 287,) s
+25.8 418 M (79:) s
+52.2 418 M
+(     TOK_FIELD = 288,) s
+25.8 406 M (80:) s
+52.2 406 M
+(     TOK_ORD = 289,) s
+25.8 394 M (81:) s
+52.2 394 M
+(     TOK_CHR = 290,) s
+25.8 382 M (82:) s
+52.2 382 M
+(     TOK_ROOT = 291) s
+25.8 370 M (83:) s
+52.2 370 M
+(   };) s
+25.8 358 M (84:) s
+52.2 358 M
+(#endif) s
+25.8 346 M (85:) s
+25.8 334 M (86:) s
+25.8 322 M (87:) s
+52.2 322 M
+(#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED) s
+25.8 310 M (88:) s
+52.2 310 M
+(typedef int YYSTYPE;) s
+25.8 298 M (89:) s
+52.2 298 M
+(# define YYSTYPE_IS_TRIVIAL 1) s
+25.8 286 M (90:) s
+52.2 286 M
+(# define yystype YYSTYPE /* obsolescent; will be withdrawn */) s
+25.8 274 M (91:) s
+52.2 274 M
+(# define YYSTYPE_IS_DECLARED 1) s
+25.8 262 M (92:) s
+52.2 262 M
+(#endif) s
+25.8 250 M (93:) s
+25.8 238 M (94:) s
+52.2 238 M
+(extern YYSTYPE yylval;) s
+25.8 226 M (95:) s
+25.8 214 M (96:) s
+52.2 214 M
+(#ifdef YYPARSE_PARAM) s
+25.8 202 M (97:) s
+52.2 202 M
+(#if defined __STDC__ || defined __cplusplus) s
+25.8 190 M (98:) s
+52.2 190 M
+(int yyparse \(void *YYPARSE_PARAM\);) s
+25.8 178 M (99:) s
+52.2 178 M
+(#else) s
+19.2 166 M (100:) s
+52.2 166 M
+(int yyparse \(\);) s
+19.2 154 M (101:) s
+52.2 154 M
+(#endif) s
+19.2 142 M (102:) s
+52.2 142 M
+(#else /* ! YYPARSE_PARAM */) s
+19.2 130 M (103:) s
+52.2 130 M
+(#if defined __STDC__ || defined __cplusplus) s
+19.2 118 M (104:) s
+52.2 118 M
+(int yyparse \(void\);) s
+19.2 106 M (105:) s
+52.2 106 M
+(#else) s
+19.2 94 M (106:) s
+52.2 94 M
+(int yyparse \(\);) s
+19.2 82 M (107:) s
+52.2 82 M
+(#endif) s
+19.2 70 M (108:) s
+52.2 70 M
+(#endif /* ! YYPARSE_PARAM */) s
+19.2 58 M (109:) s
+19.2 46 M (110:) s
+52.2 46 M
+(#endif /* !YY_YY_YYPARSE_H_INCLUDED  */) s
+_R
+S
+%%Page: (1) 16
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 1 def
+/fname (parser.y) def
+/fdir (.) def
+/ftail (parser.y) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:13) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+32.4 694 M (1:) s
+52.2 694 M
+(%{) s
+32.4 682 M (2:) s
+52.2 682 M
+(// Dummy parser for scanner project.) s
+32.4 670 M (3:) s
+32.4 658 M (4:) s
+52.2 658 M
+(#include <cassert>) s
+32.4 646 M (5:) s
+32.4 634 M (6:) s
+52.2 634 M
+(#include "lyutils.h") s
+32.4 622 M (7:) s
+52.2 622 M
+(#include "astree.h") s
+32.4 610 M (8:) s
+32.4 598 M (9:) s
+52.2 598 M
+(%}) s
+25.8 586 M (10:) s
+25.8 574 M (11:) s
+52.2 574 M
+(%debug) s
+25.8 562 M (12:) s
+52.2 562 M
+(%defines) s
+25.8 550 M (13:) s
+52.2 550 M
+(%error-verbose) s
+25.8 538 M (14:) s
+52.2 538 M
+(%token-table) s
+25.8 526 M (15:) s
+52.2 526 M
+(%verbose) s
+25.8 514 M (16:) s
+25.8 502 M (17:) s
+52.2 502 M
+(%token TOK_VOID TOK_CHAR TOK_INT TOK_STRING) s
+25.8 490 M (18:) s
+52.2 490 M
+(%token TOK_IF TOK_ELSE TOK_WHILE TOK_RETURN TOK_STRUCT) s
+25.8 478 M (19:) s
+52.2 478 M
+(%token TOK_NULL TOK_NEW TOK_ARRAY) s
+25.8 466 M (20:) s
+52.2 466 M
+(%token TOK_EQ TOK_NE TOK_LT TOK_LE TOK_GT TOK_GE) s
+25.8 454 M (21:) s
+52.2 454 M
+(%token TOK_IDENT TOK_INTCON TOK_CHARCON TOK_STRINGCON) s
+25.8 442 M (22:) s
+25.8 430 M (23:) s
+52.2 430 M
+(%token TOK_BLOCK TOK_CALL TOK_IFELSE TOK_INITDECL) s
+25.8 418 M (24:) s
+52.2 418 M
+(%token TOK_POS TOK_NEG TOK_NEWARRAY TOK_TYPEID TOK_FIELD) s
+25.8 406 M (25:) s
+52.2 406 M
+(%token TOK_ORD TOK_CHR TOK_ROOT) s
+25.8 394 M (26:) s
+25.8 382 M (27:) s
+52.2 382 M
+(%start program) s
+25.8 370 M (28:) s
+25.8 358 M (29:) s
+52.2 358 M
+(%%) s
+25.8 346 M (30:) s
+25.8 334 M (31:) s
+52.2 334 M
+(program : program token | ;) s
+25.8 322 M (32:) s
+52.2 322 M
+(token   : '\(' | '\)' | '[' | ']' | '{' | '}' | ';' | ',' | '.') s
+25.8 310 M (33:) s
+52.2 310 M
+(        | '=' | '+' | '-' | '*' | '/' | '%' | '!') s
+25.8 298 M (34:) s
+52.2 298 M
+(        | TOK_VOID | TOK_CHAR | TOK_INT | TOK_STRING) s
+25.8 286 M (35:) s
+52.2 286 M
+(        | TOK_IF | TOK_ELSE | TOK_WHILE | TOK_RETURN | TOK_STRUCT) s
+25.8 274 M (36:) s
+52.2 274 M
+(        | TOK_NULL | TOK_NEW | TOK_ARRAY) s
+25.8 262 M (37:) s
+52.2 262 M
+(        | TOK_EQ | TOK_NE | TOK_LT | TOK_LE | TOK_GT | TOK_GE) s
+25.8 250 M (38:) s
+52.2 250 M
+(        | TOK_IDENT | TOK_INTCON | TOK_CHARCON | TOK_STRINGCON) s
+25.8 238 M (39:) s
+52.2 238 M
+(        | TOK_ORD | TOK_CHR | TOK_ROOT) s
+25.8 226 M (40:) s
+52.2 226 M
+(        ;) s
+25.8 214 M (41:) s
+25.8 202 M (42:) s
+52.2 202 M
+(%%) s
+_R
+S
+%%Page: (2) 17
+%%BeginPageSetup
+_S
+38 24 translate
+/pagenum 2 def
+/fname (parser.y) def
+/fdir (.) def
+/ftail (parser.y) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (10/18/16) def
+/pagecountstr (/2) def
+/modtimestr (13:31:13) def
+/user_header_p true def
+/user_header_left_str ($cmps104a-wm/Assignments/code/utility-code/) def
+/user_header_center_str () def
+/user_header_right_str () def
+/user_footer_p false def
+%%EndPageSetup
+column_borders
+do_header
+25.8 694 M (43:) s
+25.8 682 M (44:) s
+25.8 670 M (45:) s
+52.2 670 M
+(const char *parser::get_tname \(int symbol\) {) s
+25.8 658 M (46:) s
+52.2 658 M
+(   return yytname [YYTRANSLATE \(symbol\)];) s
+25.8 646 M (47:) s
+52.2 646 M
+(}) s
+25.8 634 M (48:) s
+25.8 622 M (49:) s
+25.8 610 M (50:) s
+52.2 610 M
+(bool is_defined_token \(int symbol\) {) s
+25.8 598 M (51:) s
+52.2 598 M
+(   return YYTRANSLATE \(symbol\) > YYUNDEFTOK;) s
+25.8 586 M (52:) s
+52.2 586 M
+(}) s
+25.8 574 M (53:) s
+25.8 562 M (54:) s
+52.2 562 M
+(/*) s
+25.8 550 M (55:) s
+52.2 550 M
+(static void* yycalloc \(size_t size\) {) s
+25.8 538 M (56:) s
+52.2 538 M
+(   void* result = calloc \(1, size\);) s
+25.8 526 M (57:) s
+52.2 526 M
+(   assert \(result != nullptr\);) s
+25.8 514 M (58:) s
+52.2 514 M
+(   return result;) s
+25.8 502 M (59:) s
+52.2 502 M
+(}) s
+25.8 490 M (60:) s
+52.2 490 M
+(*/) s
+25.8 478 M (61:) s
+_R
+S
+%%Trailer
+%%Pages: 17
+%%DocumentNeededResources: font Times-Roman Courier-Bold Times-Bold 
+%%EOF

@@ -1,0 +1,6 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: starting macros.cpp
+macros.cpp: $Id: macros.cpp,v 1.6 2016-08-18 14:02:34-07 - - $
+g++ -g -O0 -std=gnu++14 -rdynamic -Wall -Wextra -Wold-style-cast macros.cpp -o macros -lglut -lGLU -lGL -lX11 -lrt -lm
+cpplint.py.perl macros.cpp
+Done processing macros.cpp
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: finished macros.cpp

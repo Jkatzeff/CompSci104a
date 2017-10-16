@@ -1,0 +1,12 @@
+*.err
+*.tok
+*.str
+*.lexyacctrace
+*.out
+*.oc
+*.oh
+*.ast
+*.sym
+*.oil
+*.o
+yyparse.*

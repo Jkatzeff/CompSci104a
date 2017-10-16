@@ -1,0 +1,79 @@
+head	1.3;
+access;
+symbols;
+locks;
+comment	@# @;
+
+
+1.3
+date	2016.10.06.23.12.04;	author -;	state -;
+branches;
+next	1.2;
+
+1.2
+date	2013.10.12.01.53.00;	author -;	state -;
+branches;
+next	1.1;
+
+1.1
+date	2013.09.25.01.43.23;	author -;	state -;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.3
+log
+@-
+@
+text
+@#!/bin/sh
+# $Id: mk,v 1.2 2013-10-11 18:53:00-07 - - $
+FILES='astree.h    astree.cpp
+       auxlib.h    auxlib.cpp
+       lyutils.h   lyutils.cpp
+       yyparse.h   parser.y'
+bison --defines=yyparse.h --output=yyparse.cpp parser.y
+cid + $FILES
+g++ -g -c -Wall -Wextra -fsyntax-only -std=gnu++14 *.cpp
+mkpspdf Listing.ps $FILES
+@
+
+
+1.2
+log
+@-
+@
+text
+@d2 6
+a7 6
+# $Id: mk,v 1.1 2013-09-24 18:43:23-07 - - $
+FILES='astree.h    astree.cc
+       auxlib.h    auxlib.cc
+       lyutils.h   lyutils.cc
+       stringset.h stringset.cc 
+       parser.y'
+d9 2
+a10 1
+mkpspdf -s12 Listing.ps $FILES
+@
+
+
+1.1
+log
+@-
+@
+text
+@d2 8
+a9 7
+# $Id: mk.asg2-code,v 1.1 2012-10-09 18:28:08-07 - - $
+mkpspdf Listing.ps \
+astree.h astree.cc \
+auxlib.h auxlib.cc \
+lyutils.h lyutils.cc \
+stringset.h stringset.cc \
+parser.y
+@

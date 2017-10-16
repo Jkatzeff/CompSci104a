@@ -1,0 +1,347 @@
+head	1.16;
+access;
+symbols;
+locks;
+comment	@ * @;
+
+
+1.16
+date	2016.11.15.01.02.46;	author -;	state -;
+branches;
+next	1.15;
+
+1.15
+date	2016.11.15.01.02.18;	author -;	state -;
+branches;
+next	1.14;
+
+1.14
+date	2016.11.15.01.01.44;	author -;	state -;
+branches;
+next	1.13;
+
+1.13
+date	2016.11.15.01.00.55;	author -;	state -;
+branches;
+next	1.12;
+
+1.12
+date	2016.11.15.01.00.12;	author -;	state -;
+branches;
+next	1.11;
+
+1.11
+date	2016.11.15.00.59.22;	author -;	state -;
+branches;
+next	1.10;
+
+1.10
+date	2016.11.15.00.58.56;	author -;	state -;
+branches;
+next	1.9;
+
+1.9
+date	2016.11.15.00.58.09;	author -;	state -;
+branches;
+next	1.8;
+
+1.8
+date	2016.11.15.00.57.52;	author -;	state -;
+branches;
+next	1.7;
+
+1.7
+date	2016.11.15.00.57.39;	author -;	state -;
+branches;
+next	1.6;
+
+1.6
+date	2016.11.15.00.57.02;	author -;	state -;
+branches;
+next	1.5;
+
+1.5
+date	2016.11.15.00.56.21;	author -;	state -;
+branches;
+next	1.4;
+
+1.4
+date	2016.11.15.00.55.29;	author -;	state -;
+branches;
+next	1.3;
+
+1.3
+date	2016.11.15.00.54.58;	author -;	state -;
+branches;
+next	1.2;
+
+1.2
+date	2016.11.15.00.54.38;	author -;	state -;
+branches;
+next	1.1;
+
+1.1
+date	2016.11.15.00.54.18;	author -;	state -;
+branches;
+next	;
+
+
+desc
+@@
+
+
+1.16
+log
+@-
+@
+text
+@// $Id: arraydispatch.c,v 1.14 2016-11-14 17:01:44-08 - - $
+
+#include <stdio.h>
+
+void add (void) { printf ("%s\n", __PRETTY_FUNCTION__); }
+void sub (void) { printf ("%s\n", __PRETTY_FUNCTION__); }
+void mul (void) { printf ("%s\n", __PRETTY_FUNCTION__); }
+void div (void) { printf ("%s\n", __PRETTY_FUNCTION__); }
+
+typedef void (*fn) (void);
+fn dispatch[256] = {
+   ['+'] add,
+   ['-'] sub,
+   ['*'] mul,
+   ['/'] div,
+};
+
+int main() {
+   char ops[] = "+-*/";
+   for (int i = 0; ops[i]; ++i) {
+      fn f = dispatch[(int)ops[i]];
+      printf ("%p ", f);
+      f();
+   }
+}
+
+@
+
+
+1.15
+log
+@-
+@
+text
+@d22 2
+a23 1
+      printf ("%p\n", f);
+@
+
+
+1.14
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.13 2016-11-14 17:00:55-08 - - $
+d21 1
+a21 1
+      fn f = dispatch[ops[i]];
+@
+
+
+1.13
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.12 2016-11-14 17:00:12-08 - - $
+d21 1
+a21 1
+      fn f = dispatch[i];
+@
+
+
+1.12
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.11 2016-11-14 16:59:22-08 - - $
+d11 1
+a11 1
+fn dispatch[] = {
+@
+
+
+1.11
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.10 2016-11-14 16:58:56-08 - - $
+d19 3
+a21 2
+   for (char* c = "+-*/"; c; ++c) {
+      fn f = dispatch[(int)*c];
+@
+
+
+1.10
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.9 2016-11-14 16:58:09-08 - - $
+d20 2
+a21 1
+      fn f = dispatch[*c];
+@
+
+
+1.9
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.8 2016-11-14 16:57:52-08 - - $
+d19 3
+a21 1
+   for (char* c = "+-*/"; c; ++c) dispatch[(int)*c]();
+@
+
+
+1.8
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.7 2016-11-14 16:57:39-08 - - $
+d19 1
+a19 1
+   for (char* c = "+-*/"; c; ++c) dispatch[*c]();
+@
+
+
+1.7
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.6 2016-11-14 16:57:02-08 - - $
+d19 1
+a19 1
+   for (char* c = "+-*/"; c; ++c) dispatch[(int)c]();
+@
+
+
+1.6
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.5 2016-11-14 16:56:21-08 - - $
+d19 1
+a19 1
+   for (char* c = "+-*/"; c; ++c) dispatch[c]();
+@
+
+
+1.5
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.4 2016-11-14 16:55:29-08 - - $
+d10 2
+a11 1
+void (*dispatch) (void) [] =
+@
+
+
+1.4
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.3 2016-11-14 16:54:58-08 - - $
+d5 4
+a8 4
+void add() { printf ("%s\n", __PRETTY_FUNCTION__); }
+void sub() { printf ("%s\n", __PRETTY_FUNCTION__); }
+void mul() { printf ("%s\n", __PRETTY_FUNCTION__); }
+void div() { printf ("%s\n", __PRETTY_FUNCTION__); }
+d10 1
+a10 1
+void (*) (void) dispatch[] =
+@
+
+
+1.3
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.2 2016-11-14 16:54:38-08 - - $
+d5 4
+a8 4
+void add() { printf ("" __PRETTY_FUNCTION__ "\n"); }
+void sub() { printf ("" __PRETTY_FUNCTION__ "\n"); }
+void mul() { printf ("" __PRETTY_FUNCTION__ "\n"); }
+void div() { printf ("" __PRETTY_FUNCTION__ "\n"); }
+@
+
+
+1.2
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id: arraydispatch.c,v 1.1 2016-11-14 16:54:18-08 - - $
+d5 4
+a8 4
+void add() { printf (__PRETTY_FUNCTION__ "\n"); }
+void sub() { printf (__PRETTY_FUNCTION__ "\n"); }
+void mul() { printf (__PRETTY_FUNCTION__ "\n"); }
+void div() { printf (__PRETTY_FUNCTION__ "\n"); }
+@
+
+
+1.1
+log
+@-
+@
+text
+@d1 1
+a1 1
+// $Id$
+d5 4
+a8 4
+void add() { printf (__PRETTY_FUNC__ "\n"); }
+void sub() { printf (__PRETTY_FUNC__ "\n"); }
+void mul() { printf (__PRETTY_FUNC__ "\n"); }
+void div() { printf (__PRETTY_FUNC__ "\n"); }
+@

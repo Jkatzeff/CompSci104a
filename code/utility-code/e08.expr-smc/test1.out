@@ -1,0 +1,27 @@
+; 0.  1: # 1 "test1.in"; 1.  0: 
+; 1.  1: # 1 "<built-in>"
+; 2.  1: # 1 "<command-line>"
+; 3.  1: # 1 "/usr/include/stdc-predef.h" 1 3 4
+; 4.  1: # 1 "<command-line>" 2
+; 5.  1: # 1 "test1.in"
+; 6.  1: 
+; 6.  2: a=b*c+d*e;
+; ROOT "<<ROOT>>" (0.0.0)
+;    '=' "=" (6.2.2)
+;       IDENT "a" (6.2.1)
+;       '+' "+" (6.2.6)
+;          '*' "*" (6.2.4)
+;             IDENT "b" (6.2.3)
+;             IDENT "c" (6.2.5)
+;          '*' "*" (6.2.8)
+;             IDENT "d" (6.2.7)
+;             IDENT "e" (6.2.9)
+
+          pushvar   b                   ; test1.in 2.3
+          pushvar   c                   ; test1.in 2.5
+          mul                           ; test1.in 2.4
+          pushvar   d                   ; test1.in 2.7
+          pushvar   e                   ; test1.in 2.9
+          mul                           ; test1.in 2.8
+          add                           ; test1.in 2.6
+          popvar    a                   ; test1.in 2.1

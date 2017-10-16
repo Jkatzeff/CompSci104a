@@ -1,0 +1,4 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: starting addresses.c
+addresses.c: $Id: addresses.c,v 1.8 2016-08-18 14:13:59-07 - - $
+gcc -g -O0 -std=gnu11 -rdynamic -Wall -Wextra addresses.c -o addresses -lglut -lGLU -lGL -lX11 -lrt -lm
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: finished addresses.c

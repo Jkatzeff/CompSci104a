@@ -1,0 +1,6 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: starting maxvalues.cpp
+maxvalues.cpp: $Id: maxvalues.cpp,v 1.3 2016-09-21 17:09:57-07 - - $
+g++ -g -O0 -std=gnu++14 -rdynamic -Wall -Wextra -Wold-style-cast maxvalues.cpp -o maxvalues -lglut -lGLU -lGL -lX11 -lrt -lm
+cpplint.py.perl maxvalues.cpp
+Done processing maxvalues.cpp
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ mkc: finished maxvalues.cpp

@@ -1,0 +1,340 @@
+Command: zexprsm -ly test4.in
+-- popen (/usr/bin/cpp test4.in), fileno(yyin) = 4
+Starting parse
+Entering state 0
+Reducing stack by rule 5 (line 46):
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>":)
+Stack now 0
+Entering state 2
+Reading a token: --(end of buffer or a NUL)
+--accepting rule at line 35 ("# 1 "test4.in"")
+--included # 1 "test4.in"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "<built-in>"")
+--included # 1 "<built-in>"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "<command-line>"")
+--included # 1 "<command-line>"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "/usr/include/stdc-predef.h" 1 3 4")
+--included # 1 "/usr/include/stdc-predef.h"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "<command-line>" 2")
+--included # 1 "<command-line>"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "test4.in"")
+--included # 1 "test4.in"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "test4a.inh" 1")
+--included # 1 "test4a.inh"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 37 ("
+")
+--accepting rule at line 37 ("
+")
+--accepting rule at line 40 ("pi")
+Next token is token IDENT (0x5a1ca40->{IDENT 7.3.1 "pi":)
+Shifting token IDENT (0x5a1ca40->{IDENT 7.3.1 "pi":)
+Entering state 5
+Reducing stack by rule 15 (line 58):
+   $1 = token IDENT (0x5a1ca40->{IDENT 7.3.1 "pi":)
+-> $$ = nterm expr (0x5a1ca40->{IDENT 7.3.1 "pi":)
+Stack now 0 2
+Entering state 11
+Reading a token: --accepting rule at line 41 ("=")
+Next token is token '=' (0x5a1cbf0->{'=' 7.3.3 "=":)
+Shifting token '=' (0x5a1cbf0->{'=' 7.3.3 "=":)
+Entering state 16
+Reading a token: --accepting rule at line 39 ("3.141592653589793238462643383280")
+Next token is token NUMBER (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+Shifting token NUMBER (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+Entering state 6
+Reducing stack by rule 16 (line 59):
+   $1 = token NUMBER (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+-> $$ = nterm expr (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+Stack now 0 2 11 16
+Entering state 24
+Reading a token: --accepting rule at line 49 (";")
+Next token is token ';' (0x5a1ce90->{';' 7.3.36 ";":)
+Reducing stack by rule 6 (line 49):
+   $1 = nterm expr (0x5a1ca40->{IDENT 7.3.1 "pi":)
+   $2 = token '=' (0x5a1cbf0->{'=' 7.3.3 "=":)
+   $3 = nterm expr (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+-> $$ = nterm expr (0x5a1cbf0->{'=' 7.3.3 "=": 0x5a1ca40 0x5a1cd30)
+Stack now 0 2
+Entering state 11
+Next token is token ';' (0x5a1ce90->{';' 7.3.36 ";":)
+Shifting token ';' (0x5a1ce90->{';' 7.3.36 ";":)
+Entering state 22
+Reducing stack by rule 2 (line 43):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>":)
+   $2 = nterm expr (0x5a1cbf0->{'=' 7.3.3 "=": 0x5a1ca40 0x5a1cd30)
+   $3 = token ';' (0x5a1ce90->{';' 7.3.36 ";":)
+Deleting astree (0x5a1ce90->{';' 7.3.36 ";":)
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0)
+Stack now 0
+Entering state 2
+Reading a token: --accepting rule at line 37 ("
+")
+--accepting rule at line 40 ("pi")
+Next token is token IDENT (0x5a1d160->{IDENT 7.4.1 "pi":)
+Shifting token IDENT (0x5a1d160->{IDENT 7.4.1 "pi":)
+Entering state 5
+Reducing stack by rule 15 (line 58):
+   $1 = token IDENT (0x5a1d160->{IDENT 7.4.1 "pi":)
+-> $$ = nterm expr (0x5a1d160->{IDENT 7.4.1 "pi":)
+Stack now 0 2
+Entering state 11
+Reading a token: --accepting rule at line 49 (";")
+Next token is token ';' (0x5a1d240->{';' 7.4.3 ";":)
+Shifting token ';' (0x5a1d240->{';' 7.4.3 ";":)
+Entering state 22
+Reducing stack by rule 2 (line 43):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0)
+   $2 = nterm expr (0x5a1d160->{IDENT 7.4.1 "pi":)
+   $3 = token ';' (0x5a1d240->{';' 7.4.3 ";":)
+Deleting astree (0x5a1d240->{';' 7.4.3 ";":)
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160)
+Stack now 0
+Entering state 2
+Reading a token: --accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 3 "test4.in" 2")
+--included # 3 "test4.in"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 1 "test4b.inh" 1")
+--included # 1 "test4b.inh"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 37 ("
+")
+--accepting rule at line 40 ("a")
+Next token is token IDENT (0x5a1d510->{IDENT 9.2.1 "a":)
+Shifting token IDENT (0x5a1d510->{IDENT 9.2.1 "a":)
+Entering state 5
+Reducing stack by rule 15 (line 58):
+   $1 = token IDENT (0x5a1d510->{IDENT 9.2.1 "a":)
+-> $$ = nterm expr (0x5a1d510->{IDENT 9.2.1 "a":)
+Stack now 0 2
+Entering state 11
+Reading a token: --accepting rule at line 41 ("=")
+Next token is token '=' (0x5a1d650->{'=' 9.2.2 "=":)
+Shifting token '=' (0x5a1d650->{'=' 9.2.2 "=":)
+Entering state 16
+Reading a token: --accepting rule at line 40 ("pi")
+Next token is token IDENT (0x5a1d730->{IDENT 9.2.3 "pi":)
+Shifting token IDENT (0x5a1d730->{IDENT 9.2.3 "pi":)
+Entering state 5
+Reducing stack by rule 15 (line 58):
+   $1 = token IDENT (0x5a1d730->{IDENT 9.2.3 "pi":)
+-> $$ = nterm expr (0x5a1d730->{IDENT 9.2.3 "pi":)
+Stack now 0 2 11 16
+Entering state 24
+Reading a token: --accepting rule at line 44 ("*")
+Next token is token '*' (0x5a1d810->{'*' 9.2.5 "*":)
+Shifting token '*' (0x5a1d810->{'*' 9.2.5 "*":)
+Entering state 19
+Reading a token: --accepting rule at line 40 ("r")
+Next token is token IDENT (0x5a1d950->{IDENT 9.2.6 "r":)
+Shifting token IDENT (0x5a1d950->{IDENT 9.2.6 "r":)
+Entering state 5
+Reducing stack by rule 15 (line 58):
+   $1 = token IDENT (0x5a1d950->{IDENT 9.2.6 "r":)
+-> $$ = nterm expr (0x5a1d950->{IDENT 9.2.6 "r":)
+Stack now 0 2 11 16 24 19
+Entering state 27
+Reading a token: --accepting rule at line 46 ("^")
+Next token is token '^' (0x5a1da90->{'^' 9.2.7 "^":)
+Shifting token '^' (0x5a1da90->{'^' 9.2.7 "^":)
+Entering state 21
+Reading a token: --accepting rule at line 39 ("2")
+Next token is token NUMBER (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+Shifting token NUMBER (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+Entering state 6
+Reducing stack by rule 16 (line 59):
+   $1 = token NUMBER (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+-> $$ = nterm expr (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+Stack now 0 2 11 16 24 19 27 21
+Entering state 29
+Reading a token: --accepting rule at line 49 (";")
+Next token is token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Reducing stack by rule 11 (line 54):
+   $1 = nterm expr (0x5a1d950->{IDENT 9.2.6 "r":)
+   $2 = token '^' (0x5a1da90->{'^' 9.2.7 "^":)
+   $3 = nterm expr (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+-> $$ = nterm expr (0x5a1da90->{'^' 9.2.7 "^": 0x5a1d950 0x5a1dbd0)
+Stack now 0 2 11 16 24 19
+Entering state 27
+Next token is token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Reducing stack by rule 9 (line 52):
+   $1 = nterm expr (0x5a1d730->{IDENT 9.2.3 "pi":)
+   $2 = token '*' (0x5a1d810->{'*' 9.2.5 "*":)
+   $3 = nterm expr (0x5a1da90->{'^' 9.2.7 "^": 0x5a1d950 0x5a1dbd0)
+-> $$ = nterm expr (0x5a1d810->{'*' 9.2.5 "*": 0x5a1d730 0x5a1da90)
+Stack now 0 2 11 16
+Entering state 24
+Next token is token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Reducing stack by rule 6 (line 49):
+   $1 = nterm expr (0x5a1d510->{IDENT 9.2.1 "a":)
+   $2 = token '=' (0x5a1d650->{'=' 9.2.2 "=":)
+   $3 = nterm expr (0x5a1d810->{'*' 9.2.5 "*": 0x5a1d730 0x5a1da90)
+-> $$ = nterm expr (0x5a1d650->{'=' 9.2.2 "=": 0x5a1d510 0x5a1d810)
+Stack now 0 2
+Entering state 11
+Next token is token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Shifting token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Entering state 22
+Reducing stack by rule 2 (line 43):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160)
+   $2 = nterm expr (0x5a1d650->{'=' 9.2.2 "=": 0x5a1d510 0x5a1d810)
+   $3 = token ';' (0x5a1dd10->{';' 9.2.9 ";":)
+Deleting astree (0x5a1dd10->{';' 9.2.9 ";":)
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650)
+Stack now 0
+Entering state 2
+Reading a token: --accepting rule at line 37 ("
+")
+--accepting rule at line 39 ("3.141592653589793238462643383280")
+Next token is token NUMBER (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+Shifting token NUMBER (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+Entering state 6
+Reducing stack by rule 16 (line 59):
+   $1 = token NUMBER (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+-> $$ = nterm expr (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+Stack now 0 2
+Entering state 11
+Reading a token: --accepting rule at line 49 (";")
+Next token is token ';' (0x5a1e130->{';' 9.3.33 ";":)
+Shifting token ';' (0x5a1e130->{';' 9.3.33 ";":)
+Entering state 22
+Reducing stack by rule 2 (line 43):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650)
+   $2 = nterm expr (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+   $3 = token ';' (0x5a1e130->{';' 9.3.33 ";":)
+Deleting astree (0x5a1e130->{';' 9.3.33 ";":)
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650 0x5a1e030)
+Stack now 0
+Entering state 2
+Reading a token: --accepting rule at line 37 ("
+")
+--accepting rule at line 35 ("# 4 "test4.in" 2")
+--included # 4 "test4.in"
+--accepting rule at line 37 ("
+")
+--accepting rule at line 39 ("3")
+Next token is token NUMBER (0x5a1e280->{NUMBER 10.4.1 "3":)
+Shifting token NUMBER (0x5a1e280->{NUMBER 10.4.1 "3":)
+Entering state 6
+Reducing stack by rule 16 (line 59):
+   $1 = token NUMBER (0x5a1e280->{NUMBER 10.4.1 "3":)
+-> $$ = nterm expr (0x5a1e280->{NUMBER 10.4.1 "3":)
+Stack now 0 2
+Entering state 11
+Reading a token: --accepting rule at line 44 ("*")
+Next token is token '*' (0x5a1e4c0->{'*' 10.4.2 "*":)
+Shifting token '*' (0x5a1e4c0->{'*' 10.4.2 "*":)
+Entering state 19
+Reading a token: --accepting rule at line 39 ("4")
+Next token is token NUMBER (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+Shifting token NUMBER (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+Entering state 6
+Reducing stack by rule 16 (line 59):
+   $1 = token NUMBER (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+-> $$ = nterm expr (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+Stack now 0 2 11 19
+Entering state 27
+Reading a token: --accepting rule at line 49 (";")
+Next token is token ';' (0x5a1e6e0->{';' 10.4.4 ";":)
+Reducing stack by rule 9 (line 52):
+   $1 = nterm expr (0x5a1e280->{NUMBER 10.4.1 "3":)
+   $2 = token '*' (0x5a1e4c0->{'*' 10.4.2 "*":)
+   $3 = nterm expr (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+-> $$ = nterm expr (0x5a1e4c0->{'*' 10.4.2 "*": 0x5a1e280 0x5a1e5a0)
+Stack now 0 2
+Entering state 11
+Next token is token ';' (0x5a1e6e0->{';' 10.4.4 ";":)
+Shifting token ';' (0x5a1e6e0->{';' 10.4.4 ";":)
+Entering state 22
+Reducing stack by rule 2 (line 43):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650 0x5a1e030)
+   $2 = nterm expr (0x5a1e4c0->{'*' 10.4.2 "*": 0x5a1e280 0x5a1e5a0)
+   $3 = token ';' (0x5a1e6e0->{';' 10.4.4 ";":)
+Deleting astree (0x5a1e6e0->{';' 10.4.4 ";":)
+-> $$ = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650 0x5a1e030 0x5a1e4c0)
+Stack now 0
+Entering state 2
+Reading a token: --accepting rule at line 37 ("
+")
+--(end of buffer or a NUL)
+--EOF (start condition 0)
+Now at end of input.
+Reducing stack by rule 1 (line 40):
+   $1 = nterm stmtseq (0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650 0x5a1e030 0x5a1e4c0)
+-> $$ = nterm program (nullptr)
+Stack now 0
+Entering state 1
+Now at end of input.
+Shifting token $end ()
+Entering state 3
+Stack now 0 1 3
+Cleanup: popping token $end ()
+Cleanup: popping nterm program (nullptr)
+Dumping parser::root:
+0x5a18320->{ROOT 0.0.0 "<<ROOT>>": 0x5a1cbf0 0x5a1d160 0x5a1d650 0x5a1e030 0x5a1e4c0
+   0x5a1cbf0->{'=' 7.3.3 "=": 0x5a1ca40 0x5a1cd30
+      0x5a1ca40->{IDENT 7.3.1 "pi":
+      0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":
+   0x5a1d160->{IDENT 7.4.1 "pi":
+   0x5a1d650->{'=' 9.2.2 "=": 0x5a1d510 0x5a1d810
+      0x5a1d510->{IDENT 9.2.1 "a":
+      0x5a1d810->{'*' 9.2.5 "*": 0x5a1d730 0x5a1da90
+         0x5a1d730->{IDENT 9.2.3 "pi":
+         0x5a1da90->{'^' 9.2.7 "^": 0x5a1d950 0x5a1dbd0
+            0x5a1d950->{IDENT 9.2.6 "r":
+            0x5a1dbd0->{NUMBER 9.2.8 "2":
+   0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":
+   0x5a1e4c0->{'*' 10.4.2 "*": 0x5a1e280 0x5a1e5a0
+      0x5a1e280->{NUMBER 10.4.1 "3":
+      0x5a1e5a0->{NUMBER 10.4.3 "4":
+Dumping string_set:
+string_set[   3]:    8248777770799913213 0x5a1e368->"3"
+                    6637313742931709005 0x5a1d8f8->"*"
+                   11597697714117577063 0x5a1ccd8->"="
+                    5344662657899890615 0x5a1cf78->";"
+string_set[   6]:    3729804957429652673 0x5a18418->"<<ROOT>>"
+string_set[   9]:    4551451650890805270 0x5a1dcb8->"2"
+string_set[  11]:    1998636459596678225 0x5a1db78->"^"
+string_set[  12]:   15530967369654070964 0x5a1cb28->"pi"
+                   14518329498511883088 0x5a1da38->"r"
+string_set[  17]:    4993892634952068459 0x5a1d5f8->"a"
+string_set[  20]:   17027087115628340017 0x5a1ce38->"3.141592653589793238462643383280"
+string_set[  21]:   16215888864653804456 0x5a1e688->"4"
+load_factor = 0.522
+bucket_count = 23
+max_bucket_size = 4
+Deleting astree (0x5a1e5a0->{NUMBER 10.4.3 "4":)
+Deleting astree (0x5a1e280->{NUMBER 10.4.1 "3":)
+Deleting astree (0x5a1e4c0->{'*' 10.4.2 "*":)
+Deleting astree (0x5a1e030->{NUMBER 9.3.1 "3.141592653589793238462643383280":)
+Deleting astree (0x5a1dbd0->{NUMBER 9.2.8 "2":)
+Deleting astree (0x5a1d950->{IDENT 9.2.6 "r":)
+Deleting astree (0x5a1da90->{'^' 9.2.7 "^":)
+Deleting astree (0x5a1d730->{IDENT 9.2.3 "pi":)
+Deleting astree (0x5a1d810->{'*' 9.2.5 "*":)
+Deleting astree (0x5a1d510->{IDENT 9.2.1 "a":)
+Deleting astree (0x5a1d650->{'=' 9.2.2 "=":)
+Deleting astree (0x5a1d160->{IDENT 7.4.1 "pi":)
+Deleting astree (0x5a1cd30->{NUMBER 7.3.4 "3.141592653589793238462643383280":)
+Deleting astree (0x5a1ca40->{IDENT 7.3.1 "pi":)
+Deleting astree (0x5a1cbf0->{'=' 7.3.3 "=":)
+Deleting astree (0x5a18320->{ROOT 0.0.0 "<<ROOT>>":)

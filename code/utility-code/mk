@@ -1,0 +1,11 @@
+#!/bin/sh
+# $Id: mk,v 1.3 2016-10-06 16:12:04-07 - - $
+FILES='astree.h     astree.cpp
+       auxlib.h     auxlib.cpp
+       lyutils.h    lyutils.cpp
+       string_set.h string_set.cpp
+       yyparse.h    parser.y'
+bison --defines=yyparse.h --output=yyparse.cpp parser.y
+cid + $FILES
+g++ -g -c -Wall -Wextra -fsyntax-only -std=gnu++14 *.cpp
+mkpspdf Listing.ps $FILES
